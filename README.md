@@ -1,6 +1,6 @@
 # Finanças Cantinho 🏠💰
 
-Sistema de controle de despesas domésticas com interface moderna e responsiva.
+Sistema de controle de despesas domésticas.
 
 ## 🚀 Tecnologias
 
