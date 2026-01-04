@@ -32,7 +32,7 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Descricao).IsRequired().HasMaxLength(200);
-            entity.Property(e => e.Valor).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Valor).HasColumnType("numeric(18,2)");
             entity.Property(e => e.Observacao).HasMaxLength(500);
             
             entity.HasOne(e => e.Categoria)
@@ -55,7 +55,7 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Nome).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Limite).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Limite).HasColumnType("numeric(18,2)");
             entity.Property(e => e.CriadoEm);
             entity.HasIndex(e => e.Nome).IsUnique(false);
         });

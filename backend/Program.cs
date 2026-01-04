@@ -38,9 +38,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Database
+// Database - PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // JWT Authentication
 var jwtSecret = builder.Configuration["JwtSettings:Secret"] ?? "DefaultSecretKey12345678901234567890";

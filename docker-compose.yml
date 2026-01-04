@@ -23,26 +23,24 @@ services:
   # ==============================================
   # FINANÇAS CANTINHO - Aplicação
   # ==============================================
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: financas-sqlserver
+  postgres:
+    image: postgres:16-alpine
+    container_name: financas-postgres
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:-SuaSenhaForte@123}
-      - MSSQL_PID=Express
-    # Não expor porta em produção
-    # ports:
-    #   - "1433:1433"
+      - POSTGRES_USER=financas
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-SuaSenhaForte@123}
+      - POSTGRES_DB=financasdb
     volumes:
-      - sqlserver-data:/var/opt/mssql
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - financas-network
     healthcheck:
-      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${MSSQL_SA_PASSWORD:-SuaSenhaForte@123}" -C -Q "SELECT 1" || exit 1
+      test: ["CMD-SHELL", "pg_isready -U financas -d financasdb"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 30s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
   backend:
     build:
@@ -52,15 +50,14 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=FinancasDB;User Id=sa;Password=${MSSQL_SA_PASSWORD:-SuaSenhaForte@123};TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=financasdb;Username=financas;Password=${POSTGRES_PASSWORD:-SuaSenhaForte@123}
       - JwtSettings__Secret=${JWT_SECRET:-SuaChaveSecretaMuitoLonga123456789012345678901234567890}
       - JwtSettings__Issuer=FinancasCantinho
       - JwtSettings__Audience=FinancasCantinhoUsers
       - AdminSettings__Username=${ADMIN_USERNAME:-admin}
       - AdminSettings__Password=${ADMIN_PASSWORD:-admin123}
-    # Não expor porta - acesso apenas interno via nginx
     depends_on:
-      sqlserver:
+      postgres:
         condition: service_healthy
     networks:
       - financas-network
@@ -71,7 +68,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: financas-frontend
-    # Não expor porta - acesso via nginx-proxy
     depends_on:
       - backend
     networks:
@@ -79,7 +75,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  sqlserver-data:
+  postgres-data:
 
 networks:
   financas-network:
