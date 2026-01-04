@@ -1,0 +1,29 @@
+# Ambiente
+.env
+.env.local
+.env.production
+
+# Certificados SSL
+certbot/
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# .NET
+backend/bin/
+backend/obj/
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
